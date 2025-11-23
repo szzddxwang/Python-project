@@ -4,26 +4,26 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
-# 优先用 st_folium；不可用时退回 folium_static
+# Prefer st_folium; fallback to folium_static if unavailable
 try:
     from streamlit_folium import st_folium, folium_static
-except Exception:  # pragma: no cover - fallback only
+except Exception:  # pragma: no cover, fallback only
     st_folium = None
     folium_static = None
 
 
-def render_map(df: pd.DataFrame, selected_postcode=None, highlight_address=None, max_points: int = 3000):
+def render_map(df: pd.DataFrame, highlight_address=None, max_points: int = 3000):
     """
-    渲染 Folium 地图：
-    - 只根据传入的 df 画点（df 已经过滤了 ZIP 和其他条件）
-    - max_points：为避免一次性加载过多点（卡或不显示），做一个上限
-    - highlight_address：在地图上额外用 CircleMarker 高亮一套房子
+    Render a Folium map:
+    - Plot markers only from the given df (df already filtered by ZIP and other conditions)
+    - max_points: upper bound to avoid loading too many points at once (lag or nothing shown)
+    - highlight_address: additionally highlight one listing on the map with a CircleMarker
     """
     if df.empty:
         st.info("No data to show on map.")
         return None
 
-    # 限制最大点数，避免前端一次渲染过重
+    # Limit maximum number of points to avoid heavy front end rendering
     if len(df) > max_points:
         df_show = df.head(max_points).copy()
         st.caption(
@@ -49,7 +49,7 @@ def render_map(df: pd.DataFrame, selected_postcode=None, highlight_address=None,
             popup=folium.Popup(html, max_width=350),
         ).add_to(cluster)
 
-    # 如果提供 highlight_address，则高亮画一个圆
+    # If highlight_address is provided, draw a circle to highlight it
     if highlight_address:
         row = df_show[df_show["full_address"] == highlight_address].head(1)
         if not row.empty:
@@ -62,7 +62,7 @@ def render_map(df: pd.DataFrame, selected_postcode=None, highlight_address=None,
                 fill_opacity=0.6,
             ).add_to(m)
 
-    # 渲染（首选 st_folium，失败则 folium_static）
+    # Render
     try:
         if st_folium is not None:
             return st_folium(m, width=960, height=620)
@@ -83,8 +83,8 @@ def render_map(df: pd.DataFrame, selected_postcode=None, highlight_address=None,
 
 def find_listing_from_click(map_data, df: pd.DataFrame):
     """
-    根据地图点击位置，在 df 中找到最近的一套房源。
-    使用 numpy 向量化计算距离，显著提升在大量点时的选中速度。
+    Given a clicked location on the map, find the nearest listing in df.
+    Use NumPy vectorized distance computation to significantly speed up selection when many points exist.
     """
     if not map_data or "last_object_clicked" not in map_data or map_data["last_object_clicked"] is None:
         return None
@@ -95,7 +95,7 @@ def find_listing_from_click(map_data, df: pd.DataFrame):
     if df.empty:
         return None
 
-    # 使用向量化距离计算，加快最近点查找
+    # Use vectorized distance computation to speed up nearest-point search
     coords = df[["lat", "lon"]].to_numpy()
     dists = np.abs(coords[:, 0] - lat) + np.abs(coords[:, 1] - lng)
     idx = int(dists.argmin())
