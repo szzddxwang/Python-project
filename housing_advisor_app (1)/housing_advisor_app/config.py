@@ -3,13 +3,16 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent
 
+# Main sales data (ship CSV to other machines)
 ROLLING_SALES_CSV = BASE_DIR / "data" / "rollingsales_queens_clean.csv"
-GEOCODE_CACHE = BASE_DIR / "data" / "geocode_cache.parquet"
+
+# Geocode cache: use base path WITHOUT extension, code will try .parquet then .csv
+GEOCODE_CACHE = BASE_DIR / "data" / "geocode_cache"
 GEO_SEED_CSV  = BASE_DIR / "data" / "geocode_seed.csv"
 
 GEOCODE_CITY_HINT = "Queens, NY"
 
-APP_TITLE   = "Queens Housing Advisor "
+APP_TITLE   = "Queens Housing Advisor"
 DEFAULT_LAT = 40.728
 DEFAULT_LON = -73.85
 
@@ -19,9 +22,19 @@ AFFORD_WEIGHT = 0.222
 
 FAST_START_STRICT = True
 
+
 def ensure_data_exists():
-    if not ROLLING_SALES_CSV.exists():
-        raise FileNotFoundError(
-            "Missing data/rollingsales_queens_clean.csv in ./data. "
-            "Put your CSV here (or a same-named .parquet/.feather)."
-        )
+    """
+    Basic check that the main sales file exists (CSV or same-named parquet/feather).
+    """
+    csv_path = ROLLING_SALES_CSV
+    parq_path = csv_path.with_suffix(".parquet")
+    feat_path = csv_path.with_suffix(".feather")
+
+    if csv_path.exists() or parq_path.exists() or feat_path.exists():
+        return
+
+    raise FileNotFoundError(
+        "Missing data/rollingsales_queens_clean.(csv|parquet|feather) in ./data. "
+        "Put your cleaned sales file here."
+    )
