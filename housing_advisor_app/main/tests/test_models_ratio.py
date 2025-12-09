@@ -34,7 +34,7 @@ def test_ratio_score_upper_bound():
 
 
 def test_ratio_score_middle_linear():
-    # 15~30 之间线性插值: 15 -> 1, 30 -> -1, 中点 22.5 -> 0
+    # Linear interpolation between 15 and 30: 15 to 1, 30 to -1, midpoint 22.5 to 0
     s = ratio_score(22.5)
     assert math.isclose(s, 0.0, rel_tol=1e-6)
 
@@ -67,4 +67,5 @@ def test_affordability_score_middle_linear():
 def test_affordability_score_invalid_income_is_zero():
     assert affordability_score(price=800000, income=0) == 0.0
     assert affordability_score(price=800000, income=None) == 0.0
+
 
