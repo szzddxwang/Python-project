@@ -7,7 +7,7 @@ from config import TREND_WEIGHT, RATIO_WEIGHT, AFFORD_WEIGHT
 
 
 def manual_score(x: DecisionInputs) -> float:
-    """按照 decision_engine 中的公式手动算一遍得分，确保逻辑一致。"""
+    """Manually compute the score once according to the formula in the decision_engine to ensure the logic is consistent."""
     return (
         TREND_WEIGHT * x.trend_score +
         RATIO_WEIGHT * x.ratio_score +
@@ -40,9 +40,9 @@ def test_decision_engine_label_and_score(inputs: DecisionInputs):
     s = manual_score(inputs)
     expected_label = expected_label_from_score(s)
 
-    # 分数应该和手动计算一致
+    # The score should be consistent with the manual calculation
     assert math.isclose(result.score, s, rel_tol=1e-6)
-    # label 应该符合阈值规则
+    # The label should comply with the threshold rules.
     assert result.label == expected_label
 
 
@@ -52,7 +52,8 @@ def test_decision_engine_explanation_contains_details():
     result = engine.decide(x)
 
     assert "Composite =" in result.explanation
-    # 文本中包含各个子分数
+    #The text contains each of the sub-scores.
     assert "trend 0.10" in result.explanation
     assert "ratio 0.20" in result.explanation
     assert "afford 0.30" in result.explanation
+
