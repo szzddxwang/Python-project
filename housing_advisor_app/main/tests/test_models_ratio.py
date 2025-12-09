@@ -57,13 +57,14 @@ def test_affordability_score_bad_case():
 
 
 def test_affordability_score_middle_linear():
-    # ratio = 1.5 => 介于 1 和 -1 之间
+    # ratio = 1.5 => Between 1 and -1
     # ratio = price / (income * 4) = 1_200_000 / (200_000 * 4) = 1.5
     score = affordability_score(price=1_200_000, income=200_000)
-    # 理论值: 1 - (1.5 - 1) / (2.5 - 1) * 2 = 1 - (0.5 / 1.5) * 2 = 1 - 2/3 = 1/3
+    # Theoretical value: 1 - (1.5 - 1) / (2.5 - 1) * 2 = 1 - (0.5 / 1.5) * 2 = 1 - 2/3 = 1/3
     assert math.isclose(score, 1.0 / 3.0, rel_tol=1e-6)
 
 
 def test_affordability_score_invalid_income_is_zero():
     assert affordability_score(price=800000, income=0) == 0.0
     assert affordability_score(price=800000, income=None) == 0.0
+
