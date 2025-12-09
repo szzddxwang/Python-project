@@ -13,7 +13,6 @@ from Neuralnetwork import get_ranker, save_ranker, extract_features
 def _k(s: str) -> str:
     return hashlib.md5(s.encode("utf-8")).hexdigest()[:10]
 
-
 def _signature(active_zip: str, price_range, sqft_range, min_beds, min_baths, keyword: str):
     return (
         str(active_zip),
