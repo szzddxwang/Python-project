@@ -33,7 +33,8 @@ def test_compute_trend_score_window_effect():
 
 
 def test_compute_trend_score_clipped_upper_bound():
-    # 极端情况让 raw > 1，返回值应被截断到 1.0
+    # In extreme cases where raw > 1, the returned value should be clipped to 1.0.
     s = pd.Series([1, 2, 1000])
     score = compute_trend_score(s)
     assert score == 1.0
+
